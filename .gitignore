@@ -1,0 +1,4 @@
+/.bundle
+/config/access.rb
+/Procfile
+/dump.rdb
