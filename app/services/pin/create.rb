@@ -1,7 +1,8 @@
 class Pin::Create < Service::Base
   attr_accessor :id, :code, :errors
 
-  def initialize(id, phone, expire = 120, attempts = 100)
+  def initialize(app_key, id, phone, expire = 120, attempts = 100)
+    @app_key = app_key
     @id = id
     @phone = phone
     @code = generate_code
@@ -11,14 +12,30 @@ class Pin::Create < Service::Base
   end
 
   def call
-    Pin.create(key: id, value: code, expire: @expire)
-    create_bruteforce_protection
-    send_code
+    verify!
+
+    if errors.empty?
+      Pin.create(key: id, value: code, expire: @expire)
+      create_bruteforce_protection
+      send_code
+    end
 
     self
   end
 
   private
+
+    def verify!
+      check_app_key
+    end
+
+    def check_app_key
+      correct_app_key = Pincode::Application.settings.app_key
+
+      return if correct_app_key == @app_key
+
+      errors << 'invalid_app_key'
+    end
 
     def generate_code
       (9999 * rand).to_i

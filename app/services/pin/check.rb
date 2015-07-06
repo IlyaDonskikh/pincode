@@ -1,8 +1,9 @@
 class Pin::Check < Service::Base
   attr_accessor :id, :verification_code, :errors
 
-  def initialize(id, verification_code)
+  def initialize(app_key, id, verification_code)
     @id = id
+    @app_key = app_key
     @verification_code = verification_code
     @errors = []
   end
@@ -10,7 +11,7 @@ class Pin::Check < Service::Base
   def call
     verify!
 
-    Pin.delete(id) if @errors.empty?
+    Pin.delete(id) if errors.empty?
 
     self
   end
@@ -18,10 +19,19 @@ class Pin::Check < Service::Base
   private
 
     def verify!
+      check_app_key
       check_code_present
       check_id_present
       check_bruteforce
       check_code_valid
+    end
+
+    def check_app_key
+      correct_app_key = Pincode::Application.settings.app_key
+
+      return if correct_app_key == @app_key
+
+      errors << 'invalid_app_key'
     end
 
     def check_code_present

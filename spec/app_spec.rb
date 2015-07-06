@@ -1,48 +1,31 @@
 describe 'pin application' do
   it 'create pin' do
-    post 'v1/pins/', id: generate_number
+    post 'v1/pins/', id: generate_number, app_key: 'test_app_key'
 
     expect(last_response.status).to eq(200)
   end
 
-  it 'create counter' do
-    id = generate_number
-
-    p Pincode::Application.settings.app_key
-
-    post 'v1/pins/', id: id
-
-    counter = Counter.get_value_by id
-
-    expect(counter).to eq("100")
-  end
-
-  it 'return 403 if code invalid' do
-    id = generate_number
-    Pin::Create.call(id, nil, 1000)
-
-    get "v1/pins/#{id}/check", code: generate_number
+  it 'return 403 if app key invalid' do
+    post 'v1/pins/', id: generate_number, app_key: 'invalid_key'
 
     expect(last_response.status).to eq(403)
   end
 
-  it 'delete pin if more than three attempts' do
+  it 'return 403 if code invalid' do
     id = generate_number
-    items = []
-    Pin::Create.call(id, nil, 1000, 3)
+    Pin::Create.call('test_app_key', id, nil, 1000, 100)
 
-    6.times do
-      get "v1/pins/#{id}/check", code: generate_number
+    get "v1/pins/#{id}/check", code: generate_number, app_key: 'test_app_key'
 
-      items << Pin.get_value_by(id)
-    end
-
-    expect(items.compact.count).to eq(3)
+    expect(last_response.status).to eq(403)
   end
 
-  private
+  it 'return 200 if code invalid' do
+    id = generate_number
+    pin = Pin::Create.call('test_app_key', id, nil, 1000, 100)
 
-    def generate_number
-      (9999 * rand).to_i.to_s
-    end
+    get "v1/pins/#{id}/check", code: pin.code, app_key: 'test_app_key'
+
+    expect(last_response.status).to eq(200)
+  end
 end

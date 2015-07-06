@@ -5,20 +5,22 @@ module Pincode
     end
 
     post '/v1/pins/?' do
-      id = params[:id]
-      phone = params[:phone]
-      expire = params[:expire]
-
-      service = Pin::Create.call(id, phone, expire)
+      service = Pin::Create.call(
+        params[:app_key],
+        params[:id],
+        params[:expire],
+        params[:attempts]
+      )
 
       generate_response(service)
     end
 
     get '/v1/pins/:id/check' do
-      id = params[:id]
-      code = params[:code]
-
-      service = Pin::Check.call(id, code)
+      service = Pin::Check.call(
+        params[:app_key],
+        params[:id],
+        params[:code]
+      )
 
       generate_response(service)
     end
