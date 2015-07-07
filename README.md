@@ -16,8 +16,7 @@ Launch:
 1. Start Redis (port: 6379)
 2. Start application ```rackup```
 
-## Getting started
-*Note: Response format - JSON.*
+## Operations
 
 ### Create
 ```ruby
@@ -36,6 +35,7 @@ POST '/v1/pins/',
 POST '/v1/pins/$id/check', app_key: $app_key, code: $code
 ```
 
+## Responses
 if code is valid server return the status ```200```, else response will be ```403```.
 
 ## Tests
