@@ -20,10 +20,21 @@ Launch:
 *Note: Response format - JSON.*
 
 ### Create
-```POST '/v1/create', id: $token```
+```ruby
+POST '/v1/pins/', 
+     api_key: $app_key, 
+     id: id, 
+     message: $message, 
+     phone: $phone, 
+     attempts: $attempts, 
+     expire: $expire, 
+     sender_api_key: $sender_api_key
+```
 
 ### Check
-```POST '/v1/check', id: $token, code: $code```
+```ruby
+POST '/v1/pins/$id/check', app_key: $app_key, code: $code
+```
 
 if code is valid server return the status ```200```, else response will be ```403```.
 
