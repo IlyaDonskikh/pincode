@@ -1,7 +1,7 @@
 describe 'pin check service' do
   it 'delete pin if more than three attempts' do
     id = generate_number
-    Pin::Create.call('test_app_key', id, nil, 1000, 3)
+    Pin::Create.call generate_pin_params(id, 3)
     items = []
 
     6.times do

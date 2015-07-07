@@ -1,13 +1,15 @@
 class Pin::Create < Service::Base
   attr_accessor :id, :code, :errors
 
-  def initialize(app_key, id, phone, expire = 120, attempts = 100)
-    @app_key = app_key
-    @id = id
-    @phone = phone
+  def initialize(attrs)
+    @app_key = attrs[:app_key]
+    @id = attrs[:id]
+    @message = attrs[:message]
+    @phone = attrs[:phone]
+    @expire = attrs[:expire]
+    @attempts = attrs[:attempts]
     @code = generate_code
-    @expire = expire # seconds
-    @attempts = attempts
+
     @errors = []
   end
 
@@ -27,6 +29,7 @@ class Pin::Create < Service::Base
 
     def verify!
       check_app_key
+      check_message
     end
 
     def check_app_key
@@ -35,6 +38,12 @@ class Pin::Create < Service::Base
       return if correct_app_key == @app_key
 
       errors << 'invalid_app_key'
+    end
+
+    def check_message
+      return if @message.match('{{pin}}')
+
+      errors << 'invalid_msg'
     end
 
     def generate_code
@@ -46,6 +55,12 @@ class Pin::Create < Service::Base
     end
 
     def send_code
-      p self.code unless ENV['RACK_ENV']
+      msg = generate_message
+
+      p msg unless ENV['RACK_ENV']
+    end
+
+    def generate_message
+      @message.gsub('{{pin}}', @code.to_s)
     end
 end

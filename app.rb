@@ -5,13 +5,7 @@ module Pincode
     end
 
     post '/v1/pins/?' do
-      service = Pin::Create.call(
-        params[:app_key],
-        params[:id],
-        params[:phone],
-        params[:expire],
-        params[:attempts]
-      )
+      service = Pin::Create.call(params)
 
       generate_response(service)
     end
