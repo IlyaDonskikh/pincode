@@ -8,6 +8,7 @@ module Pincode
       service = Pin::Create.call(
         params[:app_key],
         params[:id],
+        params[:phone],
         params[:expire],
         params[:attempts]
       )

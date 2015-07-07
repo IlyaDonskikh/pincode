@@ -46,6 +46,6 @@ class Pin::Create < Service::Base
     end
 
     def send_code
-      # Send sms to phone number
+      p self.code unless ENV['RACK_ENV']
     end
 end
