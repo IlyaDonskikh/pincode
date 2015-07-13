@@ -31,11 +31,11 @@ private
       phone: generate_number,
       attempts: attempts,
       expire: 120,
-      sender_params: generate_sender_params
+      sender: generate_sender
     }
   end
 
-  def generate_sender_params
+  def generate_sender
     {
       'geatway' => 'Sms::Smsru',
       'smsru_api_id' => generate_number

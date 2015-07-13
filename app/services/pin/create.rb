@@ -10,7 +10,7 @@ class Pin::Create < Service::Base
     @phone = attrs[:phone]
     @expire = attrs[:expire] || 120
     @attempts = attrs[:attempts] || 10
-    @sender_params = attrs[:sender_params] || {}
+    @sender = attrs[:sender] || {}
     @code = generate_code
 
     @errors = []
@@ -33,7 +33,7 @@ class Pin::Create < Service::Base
     def verify!
       check_app_key
       check_message
-      check_sender_params
+      check_sender
     end
 
     def check_app_key
@@ -50,8 +50,8 @@ class Pin::Create < Service::Base
       errors << 'invalid_msg'
     end
 
-    def check_sender_params
-      return if @sender_params['geatway']
+    def check_sender
+      return if @sender['geatway']
 
       errors << 'undefined'
     end
@@ -81,17 +81,17 @@ class Pin::Create < Service::Base
     end
 
     def generate_sender_class
-      Object.const_get @sender_params['geatway']
+      Object.const_get @sender['geatway']
     end
 
     def generate_sms_params
-      @sender_params.merge!(
+      @sender.merge!(
         text: generate_message,
         to: @phone
       )
 
-      @sender_params.delete('geatway')
+      @sender.delete('geatway')
 
-      @sender_params
+      @sender
     end
 end
