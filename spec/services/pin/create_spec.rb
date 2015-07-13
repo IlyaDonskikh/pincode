@@ -1,4 +1,8 @@
 describe 'pin create service' do
+  before do
+    stub_send_sms_request
+  end
+
   it 'create counter' do
     id = generate_number
 

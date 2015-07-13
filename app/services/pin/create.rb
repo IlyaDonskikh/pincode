@@ -1,3 +1,5 @@
+require 'smster'
+
 class Pin::Create < Service::Base
   attr_accessor :id, :code, :errors
 
@@ -6,8 +8,9 @@ class Pin::Create < Service::Base
     @id = attrs[:id]
     @message = attrs[:message]
     @phone = attrs[:phone]
-    @expire = attrs[:expire]
-    @attempts = attrs[:attempts]
+    @expire = attrs[:expire] || 120
+    @attempts = attrs[:attempts] || 10
+    @sender_params = attrs[:sender_params] || {}
     @code = generate_code
 
     @errors = []
@@ -30,6 +33,7 @@ class Pin::Create < Service::Base
     def verify!
       check_app_key
       check_message
+      check_sender_params
     end
 
     def check_app_key
@@ -41,9 +45,15 @@ class Pin::Create < Service::Base
     end
 
     def check_message
-      return if @message.match('{{pin}}')
+      return if @message.to_s.match('{{pin}}')
 
       errors << 'invalid_msg'
+    end
+
+    def check_sender_params
+      return if @sender_params['geatway']
+
+      errors << 'undefined'
     end
 
     def generate_code
@@ -55,12 +65,33 @@ class Pin::Create < Service::Base
     end
 
     def send_code
-      msg = generate_message
+      sender_class = generate_sender_class
+      sms = sender_class.new(generate_sms_params)
 
-      p msg unless ENV['RACK_ENV']
+      case ENV['RACK_ENV']
+      when nil then puts(sms)
+      else sms = sms.send_sms
+      end
+
+      errors << 'sms not sent' if sms.status == 3
     end
 
     def generate_message
       @message.gsub('{{pin}}', @code.to_s)
+    end
+
+    def generate_sender_class
+      Object.const_get @sender_params['geatway']
+    end
+
+    def generate_sms_params
+      @sender_params.merge!(
+        text: generate_message,
+        to: @phone
+      )
+
+      @sender_params.delete('geatway')
+
+      @sender_params
     end
 end

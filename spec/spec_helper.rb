@@ -1,6 +1,7 @@
 ENV['RACK_ENV'] ||= 'test'
 
 require './config/environment'
+require 'webmock/rspec'
 
 def app
   @app ||= Pincode::Application
@@ -27,8 +28,23 @@ private
       app_key: 'test_app_key',
       id: id,
       message: generate_msg,
-      phone: nil,
+      phone: generate_number,
       attempts: attempts,
-      expire: 120
+      expire: 120,
+      sender_params: generate_sender_params
     }
+  end
+
+  def generate_sender_params
+    {
+      'geatway' => 'Sms::Smsru',
+      'smsru_api_id' => generate_number
+    }
+  end
+
+  def stub_send_sms_request
+    body = "100\n201523-1000007\nbalance=52.54"
+
+    stub_request(:post, 'http://sms.ru/sms/send')
+      .to_return(status: 200, body: body)
   end

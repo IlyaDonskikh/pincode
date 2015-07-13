@@ -1,4 +1,8 @@
 describe 'pin check service' do
+  before do
+    stub_send_sms_request
+  end
+
   it 'delete pin if more than three attempts' do
     id = generate_number
     Pin::Create.call generate_pin_params(id, 3)

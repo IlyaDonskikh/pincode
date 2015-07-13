@@ -1,4 +1,8 @@
 describe 'pin application' do
+  before do
+    stub_send_sms_request
+  end
+
   it 'create pin' do
     post 'v1/pins/', generate_pin_params
 
@@ -6,7 +10,7 @@ describe 'pin application' do
   end
 
   it 'return 403 if app key invalid' do
-    post 'v1/pins/', id: generate_number, message: generate_msg, app_key: 'invalid_key'
+    post 'v1/pins/', id: generate_number, message: generate_msg, app_key: '-'
 
     expect(last_response.status).to eq(403)
   end
