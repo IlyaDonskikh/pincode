@@ -53,7 +53,7 @@ class Pin::Create < Service::Base
     def check_sender
       return if @sender['geatway']
 
-      errors << 'undefined'
+      errors << 'geatway undefined'
     end
 
     def generate_code

@@ -10,7 +10,7 @@ module Pincode
       generate_response(service)
     end
 
-    get '/v1/pins/:id/check' do
+    get '/v1/pins/:id/check/?' do
       service = Pin::Check.call(
         params[:app_key],
         params[:id],
