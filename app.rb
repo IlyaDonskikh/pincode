@@ -1,7 +1,7 @@
 module Pincode
   class Application < Sinatra::Base
     configure do
-      set :app_key, ENV.fetch('APP_KEY', 'test_app_key')
+      set :app_key, ENV.fetch('APP_KEY_ENV', 'test_app_key')
     end
 
     post '/v1/pins/?' do
